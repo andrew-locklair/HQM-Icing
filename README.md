@@ -13,6 +13,15 @@ Please direct any questions to https://www.reddit.com/u/xParabolax.
 
 # Upcoming Features
 1) Change faceoffs based on zone (left, right defensive zone). This would change puck location and skater location.
+
 2) Enable 3 different options for icing based on configuration files: hybrid, no-touch, and touch icing. Currently no-touch is the only option.
+
 3) Add more concise options for displaying the icing notifications.
+
 4) Add countdown timer for faceoffs.
+
+5) Check for invalid glitch shots that ricochet quickly and disable icing for those shots.
+
+6) Only enable icing when gameplay is active.
+
+7) General code efficiency improvements.
