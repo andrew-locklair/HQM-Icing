@@ -22,6 +22,6 @@ Please direct any questions to https://www.reddit.com/u/xParabolax.
 
 5) Check for invalid glitch shots that ricochet quickly and disable icing for those shots.
 
-6) Only enable icing when gameplay is active.
+6) ~~Only enable icing when gameplay is active.~~ DONE
 
 7) General code efficiency improvements.
