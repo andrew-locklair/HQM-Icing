@@ -18,11 +18,12 @@ namespace IcingRef
             float currentPuckZ = Puck.Position.Z;
             float currentPuckY = Puck.Position.Y;
             float currentPuckX = Puck.Position.X;
+            bool puckTouched = isPuckTouched();
             Player[] players = PlayerManager.Players;
 
             // detect red icing
             if (lastTouchedPuck == HQMTeam.Red &&
-                !isPuckTouched() &&                             // has puck been shot by red and no longer touched?
+                !puckTouched &&                             // has puck been shot by red and no longer touched?
                 previousPuckZ > CENTER_ICE &&
                 currentPuckZ <= CENTER_ICE)
             {
@@ -31,7 +32,7 @@ namespace IcingRef
 
             // detect blue icing
             else if (lastTouchedPuck == HQMTeam.Blue &&
-                !isPuckTouched() &&                             // has puck been shot by blue and no longer touched?
+                !puckTouched &&                             // has puck been shot by blue and no longer touched?
                 previousPuckZ < CENTER_ICE &&
                 currentPuckZ >= CENTER_ICE)
             {
@@ -40,7 +41,7 @@ namespace IcingRef
 
             else if (currIcingState == icingState.Red)
             {
-                if (currentPuckZ > BLUE_GOALLINE_Z && isPuckTouched())
+                if (currentPuckZ > BLUE_GOALLINE_Z && puckTouched)
                 {
                     currIcingState = icingState.None;
                     if (hasWarned)
@@ -74,7 +75,7 @@ namespace IcingRef
 
             else if (currIcingState == icingState.Blue)
             {
-                if (currentPuckZ < RED_GOALLINE_Z && isPuckTouched())
+                if (currentPuckZ < RED_GOALLINE_Z && puckTouched)
                 {
                     currIcingState = icingState.None;
                     if (hasWarned)
@@ -110,7 +111,7 @@ namespace IcingRef
                 hasWarned = false;
 
             previousPuckZ = Puck.Position.Z;
-            if (isPuckTouched())
+            if (puckTouched)
                 lastTouchedPuck = teamTouchedPuck();
         }
 
