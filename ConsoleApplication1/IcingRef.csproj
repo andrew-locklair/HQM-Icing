@@ -49,7 +49,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="HQMEditorDedicated">
-      <HintPath>..\..\..\..\..\..\Source\Repos\HQMEditorDedicated\HQMEditorDedicated\bin\Debug\HQMEditorDedicated.dll</HintPath>
+      <HintPath>..\..\HQMEditorDedicated\HQMEditorDedicated\bin\Release\HQMEditorDedicated.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

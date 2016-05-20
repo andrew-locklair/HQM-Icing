@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HQMEditorDedicated;
+﻿using HQMEditorDedicated;
 
 namespace IcingRef
 {
@@ -27,7 +22,7 @@ namespace IcingRef
 
             // detect red icing
             if (lastTouchedPuck == HQMTeam.Red &&
-                !isPuckTouched() &&
+                !isPuckTouched() &&                             // has puck been shot by red and no longer touched?
                 previousPuckZ > CENTER_ICE &&
                 currentPuckZ <= CENTER_ICE)
             {
@@ -35,15 +30,15 @@ namespace IcingRef
             }
 
             // detect blue icing
-            if (lastTouchedPuck == HQMTeam.Blue &&
-                !isPuckTouched() &&
+            else if (lastTouchedPuck == HQMTeam.Blue &&
+                !isPuckTouched() &&                             // has puck been shot by blue and no longer touched?
                 previousPuckZ < CENTER_ICE &&
                 currentPuckZ >= CENTER_ICE)
             {
                 currIcingState = icingState.Blue;
             }
 
-            if (currIcingState == icingState.Red)
+            else if (currIcingState == icingState.Red)
             {
                 if (currentPuckZ > BLUE_GOALLINE_Z && isPuckTouched())
                 {
@@ -110,8 +105,10 @@ namespace IcingRef
                     }
                 }
             }
+
             else if (currIcingState == icingState.None)
                 hasWarned = false;
+
             previousPuckZ = Puck.Position.Z;
             if (isPuckTouched())
                 lastTouchedPuck = teamTouchedPuck();
