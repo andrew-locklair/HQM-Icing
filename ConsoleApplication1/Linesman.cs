@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using HQMEditorDedicated;
+using HockeyEditor;
 
 namespace IcingRef
 {
@@ -49,12 +49,12 @@ namespace IcingRef
                 {
                     currIcingState = icingState.None;
                     if (hasWarned)
-                        Chat.SendMessage("ICING CLEAR");
+                        Chat.SendChatMessage("ICING CLEAR");
                 }
 
                 else if (currentPuckZ < 17f && !hasWarned)
                 {
-                    Chat.SendMessage("ICING WARNING - RED");
+                    Chat.SendChatMessage("ICING WARNING - RED");
                     hasWarned = true;
                 }
 
@@ -62,17 +62,13 @@ namespace IcingRef
                 {
                     if ((currentPuckX < 13.75 || currentPuckX > 16.25) || currentPuckY > 0.83)
                     {
-                        Chat.SendMessage("ICING - RED");
-                        Tools.PauseGame();
-                        System.Threading.Thread.Sleep(5000);
-                        Tools.ForceFaceoff();
-                        Tools.ResumeGame();
+                        Chat.SendChatMessage("ICING - RED");
                         currIcingState = icingState.None;
                     }
                     else
                     {
                         currIcingState = icingState.None;
-                        Chat.SendMessage("GOOD GOAL - NO ICING");
+                        Chat.SendChatMessage("GOOD GOAL - NO ICING");
                     }
                 }
             }
@@ -83,12 +79,12 @@ namespace IcingRef
                 {
                     currIcingState = icingState.None;
                     if (hasWarned)
-                        Chat.SendMessage("ICING CLEAR");
+                        Chat.SendChatMessage("ICING CLEAR");
                 }
 
                 else if (currentPuckZ > 47f && !hasWarned)
                 {
-                    Chat.SendMessage("ICING WARNING - BLUE");
+                    Chat.SendChatMessage("ICING WARNING - BLUE");
                     hasWarned = true;
                 }
 
@@ -96,17 +92,13 @@ namespace IcingRef
                 {
                     if ((currentPuckX < 13.75 || currentPuckX > 16.25) || currentPuckY > 0.83)
                     {
-                        Chat.SendMessage("ICING - BLUE");
-                        Tools.PauseGame();
-                        System.Threading.Thread.Sleep(5000);
-                        Tools.ForceFaceoff();
-                        Tools.ResumeGame();
+                        Chat.SendChatMessage("ICING - BLUE");
                         currIcingState = icingState.None;
                     }
                     else
                     {
                         currIcingState = icingState.None;
-                        Chat.SendMessage("GOOD GOAL - NO ICING");
+                        Chat.SendChatMessage("GOOD GOAL - NO ICING");
                     }
                 }
             }

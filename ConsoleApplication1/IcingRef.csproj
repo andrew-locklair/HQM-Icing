@@ -48,6 +48,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HockeyEditor">
+      <HintPath>..\..\..\..\..\Source\Repos\HockeyEditor\HockeyEditor\bin\Release\HockeyEditor.dll</HintPath>
+    </Reference>
     <Reference Include="HQMEditorDedicated">
       <HintPath>..\..\..\..\..\..\Source\Repos\HQMEditorDedicated\HQMEditorDedicated\bin\Debug\HQMEditorDedicated.dll</HintPath>
     </Reference>
