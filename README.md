@@ -1,5 +1,6 @@
 # HQM-Icing
-Interfaces with HockeyQuestionMark/HockeyEditor and HQMEditorDedicated to call Icing and print to HQM chat when icing is called.
+Interfaces with HockeyQuestionMark/HockeyEditor and HQMEditorDedicated to call Icing and print to HQM chat when icing is called. Example:
+https://streamable.com/nbq4
 
 # Usage
 This project does not include HockeyEditor or HQMEditorDedicated. Please see https://github.com/HockeyQuestionMark to grab these DLLs for use with this application.
