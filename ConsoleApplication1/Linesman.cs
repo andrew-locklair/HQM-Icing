@@ -34,27 +34,20 @@ namespace IcingRef
                 !puckTouched &&                             // has puck been shot by red and no longer touched?
                 previousPuckZ > CENTER_ICE &&
                 currentPuckZ <= CENTER_ICE)
-            {
                 currIcingState = icingState.Red;
-            }
 
             // detect blue icing
             else if (lastTouchedPuck == HQMTeam.Blue &&
                 !puckTouched &&                             // has puck been shot by blue and no longer touched?
                 previousPuckZ < CENTER_ICE &&
                 currentPuckZ >= CENTER_ICE)
-            {
                 currIcingState = icingState.Blue;
-            }
+
             // call icing method
             else if (currIcingState == icingState.Red)
             {
                 if (currentPuckZ > BLUE_GOALLINE_Z && puckTouched)
-                {
-                    currIcingState = icingState.None;
-                    if (hasWarned)
-                        Chat.SendMessage("ICING CLEAR");
-                }
+                    clearIcing();
 
                 else if (currentPuckZ < BLUE_WARNINGLINE && !hasWarned)
                 {
@@ -66,27 +59,15 @@ namespace IcingRef
                 {
                     if (currIcingType == icingType.Touch)
                     {
-                        if (currentPuckX < LEFT_GOALPOST || currentPuckX > RIGHT_GOALPOST || 
-                            currentPuckY > TOP_GOALPOST)
+                        if (!puckOnNet(currentPuckX, currentPuckY))
                             currIcingState = icingState.RedCross;
                     }
 
-                    else if ((currentPuckX < LEFT_GOALPOST || currentPuckX > RIGHT_GOALPOST) || 
-                              currentPuckY > TOP_GOALPOST)
-                    {
-                        Chat.SendMessage("ICING - RED");
-                        Tools.PauseGame();
-                        System.Threading.Thread.Sleep(5000);
-                        Tools.ForceFaceoff();
-                        Tools.ResumeGame();
-                        currIcingState = icingState.None;
-                    }
+                    else if (!puckOnNet(currentPuckX, currentPuckY))
+                        callIcing("RED");
 
                     else
-                    {
-                        currIcingState = icingState.None;
-                        Chat.SendMessage("GOOD GOAL - NO ICING");
-                    }
+                        clearIcing();
                 }
             }
 
@@ -95,31 +76,17 @@ namespace IcingRef
                 if (puckTouched)
                 {
                     if (teamTouchedPuck() == HQMTeam.Red)
-                    {
-                        currIcingState = icingState.None;
-                        Chat.SendMessage("ICING CLEAR");
-                    }
+                        clearIcing();
 
                     else if (teamTouchedPuck() == HQMTeam.Blue)
-                    {
-                        Chat.SendMessage("ICING - RED");
-                        Tools.PauseGame();
-                        System.Threading.Thread.Sleep(5000);
-                        Tools.ForceFaceoff();
-                        Tools.ResumeGame();
-                        currIcingState = icingState.None;
-                    }
+                        callIcing("RED");
                 }
             }
 
             else if (currIcingState == icingState.Blue)
             {
                 if (currentPuckZ < RED_GOALLINE_Z && puckTouched)
-                {
-                    currIcingState = icingState.None;
-                    if (hasWarned)
-                        Chat.SendMessage("ICING CLEAR");
-                }
+                    clearIcing();
 
                 else if (currentPuckZ > RED_WARNINGLINE && !hasWarned)
                 {
@@ -131,25 +98,15 @@ namespace IcingRef
                 {
                     if (currIcingType == icingType.Touch)
                     {
-                        if (currentPuckX < LEFT_GOALPOST || currentPuckX > RIGHT_GOALPOST ||
-                            currentPuckY > TOP_GOALPOST)
+                        if (!puckOnNet(currentPuckX, currentPuckY))
                             currIcingState = icingState.BlueCross;
                     }
 
-                    else if ((currentPuckX < LEFT_GOALPOST || currentPuckX > RIGHT_GOALPOST) || currentPuckY > TOP_GOALPOST)
-                    {
-                        Chat.SendMessage("ICING - BLUE");
-                        Tools.PauseGame();
-                        System.Threading.Thread.Sleep(5000);
-                        Tools.ForceFaceoff();
-                        Tools.ResumeGame();
-                        currIcingState = icingState.None;
-                    }
+                    else if (!puckOnNet(currentPuckX, currentPuckY))
+                        callIcing("BLUE");
+
                     else
-                    {
-                        currIcingState = icingState.None;
-                        Chat.SendMessage("GOOD GOAL - NO ICING");
-                    }
+                        clearIcing();
                 }
             }
 
@@ -164,14 +121,7 @@ namespace IcingRef
                     }
 
                     else if (teamTouchedPuck() == HQMTeam.Red)
-                    {
-                        Chat.SendMessage("ICING - BLUE");
-                        Tools.PauseGame();
-                        System.Threading.Thread.Sleep(5000);
-                        Tools.ForceFaceoff();
-                        Tools.ResumeGame();
-                        currIcingState = icingState.None;
-                    }
+                        callIcing("BLUE");
                 }
             }
 
@@ -203,6 +153,28 @@ namespace IcingRef
                 }
             }
             return false;
+        }
+
+        void clearIcing()
+        {
+            currIcingState = icingState.None;
+            if (hasWarned)
+                Chat.SendMessage("ICING CLEAR");
+        }
+
+        void callIcing(string team = "")
+        {
+            Chat.SendMessage("ICING - " + team);
+            Tools.PauseGame();
+            System.Threading.Thread.Sleep(5000);
+            Tools.ForceFaceoff();
+            Tools.ResumeGame();
+            currIcingState = icingState.None;
+        }
+
+        bool puckOnNet(float x, float y)
+        {
+            return !(x < LEFT_GOALPOST || x > RIGHT_GOALPOST || y > TOP_GOALPOST);
         }
 
         enum icingState
