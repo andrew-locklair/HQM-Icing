@@ -7,7 +7,13 @@ namespace IcingRef
         const float BLUE_GOALLINE_Z = 4.15f;
         const float RED_GOALLINE_Z = 56.85f;
         const float CENTER_ICE = 30.5f;
+        const float BLUE_WARNINGLINE = 17f;
+        const float RED_WARNINGLINE = 47f;
+        const float LEFT_GOALPOST = 13.75f;
+        const float RIGHT_GOALPOST = 16.25f;
+        const float TOP_GOALPOST = 0.83f;
 
+        icingType currIcingType = icingType.Touch;
         HQMTeam lastTouchedPuck = HQMTeam.NoTeam;
         float previousPuckZ = Puck.Position.Z;
         bool hasWarned = false;
@@ -20,6 +26,8 @@ namespace IcingRef
             float currentPuckX = Puck.Position.X;
             bool puckTouched = isPuckTouched();
             Player[] players = PlayerManager.Players;
+            if (puckTouched)
+                lastTouchedPuck = teamTouchedPuck();
 
             // detect red icing
             if (lastTouchedPuck == HQMTeam.Red &&
@@ -38,7 +46,7 @@ namespace IcingRef
             {
                 currIcingState = icingState.Blue;
             }
-
+            // call icing method
             else if (currIcingState == icingState.Red)
             {
                 if (currentPuckZ > BLUE_GOALLINE_Z && puckTouched)
@@ -48,7 +56,7 @@ namespace IcingRef
                         Chat.SendMessage("ICING CLEAR");
                 }
 
-                else if (currentPuckZ < 17f && !hasWarned)
+                else if (currentPuckZ < BLUE_WARNINGLINE && !hasWarned)
                 {
                     Chat.SendMessage("ICING WARNING - RED");
                     hasWarned = true;
@@ -56,7 +64,15 @@ namespace IcingRef
 
                 else if (currentPuckZ <= BLUE_GOALLINE_Z)
                 {
-                    if ((currentPuckX < 13.75 || currentPuckX > 16.25) || currentPuckY > 0.83)
+                    if (currIcingType == icingType.Touch)
+                    {
+                        if (currentPuckX < LEFT_GOALPOST || currentPuckX > RIGHT_GOALPOST || 
+                            currentPuckY > TOP_GOALPOST)
+                            currIcingState = icingState.RedCross;
+                    }
+
+                    else if ((currentPuckX < LEFT_GOALPOST || currentPuckX > RIGHT_GOALPOST) || 
+                              currentPuckY > TOP_GOALPOST)
                     {
                         Chat.SendMessage("ICING - RED");
                         Tools.PauseGame();
@@ -65,10 +81,33 @@ namespace IcingRef
                         Tools.ResumeGame();
                         currIcingState = icingState.None;
                     }
+
                     else
                     {
                         currIcingState = icingState.None;
                         Chat.SendMessage("GOOD GOAL - NO ICING");
+                    }
+                }
+            }
+
+            else if (currIcingState == icingState.RedCross)
+            {
+                if (puckTouched)
+                {
+                    if (teamTouchedPuck() == HQMTeam.Red)
+                    {
+                        currIcingState = icingState.None;
+                        Chat.SendMessage("ICING CLEAR");
+                    }
+
+                    else if (teamTouchedPuck() == HQMTeam.Blue)
+                    {
+                        Chat.SendMessage("ICING - RED");
+                        Tools.PauseGame();
+                        System.Threading.Thread.Sleep(5000);
+                        Tools.ForceFaceoff();
+                        Tools.ResumeGame();
+                        currIcingState = icingState.None;
                     }
                 }
             }
@@ -82,7 +121,7 @@ namespace IcingRef
                         Chat.SendMessage("ICING CLEAR");
                 }
 
-                else if (currentPuckZ > 47f && !hasWarned)
+                else if (currentPuckZ > RED_WARNINGLINE && !hasWarned)
                 {
                     Chat.SendMessage("ICING WARNING - BLUE");
                     hasWarned = true;
@@ -90,7 +129,14 @@ namespace IcingRef
 
                 else if (currentPuckZ >= RED_GOALLINE_Z)
                 {
-                    if ((currentPuckX < 13.75 || currentPuckX > 16.25) || currentPuckY > 0.83)
+                    if (currIcingType == icingType.Touch)
+                    {
+                        if (currentPuckX < LEFT_GOALPOST || currentPuckX > RIGHT_GOALPOST ||
+                            currentPuckY > TOP_GOALPOST)
+                            currIcingState = icingState.BlueCross;
+                    }
+
+                    else if ((currentPuckX < LEFT_GOALPOST || currentPuckX > RIGHT_GOALPOST) || currentPuckY > TOP_GOALPOST)
                     {
                         Chat.SendMessage("ICING - BLUE");
                         Tools.PauseGame();
@@ -107,12 +153,32 @@ namespace IcingRef
                 }
             }
 
-            else if (currIcingState == icingState.None)
+            else if (currIcingState == icingState.BlueCross)
+            {
+                if (puckTouched)
+                {
+                    if (teamTouchedPuck() == HQMTeam.Blue)
+                    {
+                        currIcingState = icingState.None;
+                        Chat.SendMessage("ICING CLEAR");
+                    }
+
+                    else if (teamTouchedPuck() == HQMTeam.Red)
+                    {
+                        Chat.SendMessage("ICING - BLUE");
+                        Tools.PauseGame();
+                        System.Threading.Thread.Sleep(5000);
+                        Tools.ForceFaceoff();
+                        Tools.ResumeGame();
+                        currIcingState = icingState.None;
+                    }
+                }
+            }
+
+            if (currIcingState == icingState.None)
                 hasWarned = false;
 
             previousPuckZ = Puck.Position.Z;
-            if (puckTouched)
-                lastTouchedPuck = teamTouchedPuck();
         }
 
         HQMTeam teamTouchedPuck()
@@ -143,7 +209,16 @@ namespace IcingRef
         {
             None,
             Red,
-            Blue
+            Blue,
+            RedCross,
+            BlueCross
+        }
+
+        enum icingType
+        {
+            NoTouch,
+            Touch,
+            Hybrid
         }
     }
 }
