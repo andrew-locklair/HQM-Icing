@@ -17,14 +17,17 @@ namespace IcingRef
         HQMTeam lastTouchedPuck = HQMTeam.NoTeam;
         float previousPuckZ = Puck.Position.Z;
         bool hasWarned = false;
-        icingState currIcingState = icingState.None;
+        public icingState currIcingState = icingState.None;
 
         public void checkForIcing()
         {
             float currentPuckZ = Puck.Position.Z;
             float currentPuckY = Puck.Position.Y;
             float currentPuckX = Puck.Position.X;
-            bool puckTouched = isPuckTouched();
+            bool puckTouched = true;
+            if (teamTouchedPuck() == HQMTeam.NoTeam)
+                puckTouched = false;
+
             Player[] players = PlayerManager.Players;
             if (puckTouched)
                 lastTouchedPuck = teamTouchedPuck();
@@ -50,18 +53,12 @@ namespace IcingRef
                     clearIcing();
 
                 else if (currentPuckZ < BLUE_WARNINGLINE && !hasWarned)
-                {
-                    Chat.SendMessage("ICING WARNING - RED");
-                    hasWarned = true;
-                }
+                    warnIcing("RED");
 
                 else if (currentPuckZ <= BLUE_GOALLINE_Z)
                 {
-                    if (currIcingType == icingType.Touch)
-                    {
-                        if (!puckOnNet(currentPuckX, currentPuckY))
-                            currIcingState = icingState.RedCross;
-                    }
+                    if (currIcingType == icingType.Touch && !puckOnNet(currentPuckX, currentPuckY))
+                        currIcingState = icingState.RedCross;
 
                     else if (!puckOnNet(currentPuckX, currentPuckY))
                         callIcing("RED");
@@ -89,18 +86,12 @@ namespace IcingRef
                     clearIcing();
 
                 else if (currentPuckZ > RED_WARNINGLINE && !hasWarned)
-                {
-                    Chat.SendMessage("ICING WARNING - BLUE");
-                    hasWarned = true;
-                }
+                    warnIcing("BLUE");
 
                 else if (currentPuckZ >= RED_GOALLINE_Z)
                 {
-                    if (currIcingType == icingType.Touch)
-                    {
-                        if (!puckOnNet(currentPuckX, currentPuckY))
-                            currIcingState = icingState.BlueCross;
-                    }
+                    if (currIcingType == icingType.Touch && !puckOnNet(currentPuckX, currentPuckY))
+                        currIcingState = icingState.BlueCross;
 
                     else if (!puckOnNet(currentPuckX, currentPuckY))
                         callIcing("BLUE");
@@ -115,10 +106,7 @@ namespace IcingRef
                 if (puckTouched)
                 {
                     if (teamTouchedPuck() == HQMTeam.Blue)
-                    {
-                        currIcingState = icingState.None;
-                        Chat.SendMessage("ICING CLEAR");
-                    }
+                        clearIcing();
 
                     else if (teamTouchedPuck() == HQMTeam.Red)
                         callIcing("BLUE");
@@ -143,19 +131,7 @@ namespace IcingRef
             return HQMTeam.NoTeam;
         }
 
-        bool isPuckTouched()
-        {
-            foreach (Player p in PlayerManager.Players)
-            {
-                if ((p.StickPosition - Puck.Position).Magnitude < 0.25f)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        void clearIcing()
+        public void clearIcing()
         {
             currIcingState = icingState.None;
             if (hasWarned)
@@ -172,12 +148,18 @@ namespace IcingRef
             currIcingState = icingState.None;
         }
 
+        void warnIcing(string team = "")
+        {
+            Chat.SendMessage("ICING WARNING - " + team);
+            hasWarned = true;
+        }
+
         bool puckOnNet(float x, float y)
         {
             return !(x < LEFT_GOALPOST || x > RIGHT_GOALPOST || y > TOP_GOALPOST);
         }
 
-        enum icingState
+        public enum icingState
         {
             None,
             Red,

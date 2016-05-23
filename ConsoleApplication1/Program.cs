@@ -11,10 +11,12 @@ namespace IcingRef
 
             while(true)
             {
-                if (GameInfo.Period > 0 && GameInfo.IntermissionTime == 0 && 
+                if (GameInfo.Period > 0 && GameInfo.IntermissionTime == 0 &&
                     (GameInfo.AfterGoalFaceoffTime == 0 || GameInfo.AfterGoalFaceoffTime >= 649))
                     linesman.checkForIcing();
-                System.Threading.Thread.Sleep(1);       // check every millisecond
+                else if (GameInfo.AfterGoalFaceoffTime != 0 && linesman.currIcingState != Linesman.icingState.None)
+                    linesman.clearIcing();
+                System.Threading.Thread.Sleep(10);       // check every millisecond
             }
         }
     }
