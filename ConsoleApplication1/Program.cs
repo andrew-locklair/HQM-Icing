@@ -1,4 +1,5 @@
 ﻿using HQMEditorDedicated;
+using System;
 
 namespace IcingRef
 {
@@ -8,6 +9,7 @@ namespace IcingRef
         {
             MemoryEditor.Init();
             Linesman linesman = new Linesman();
+            linesman.setIcingType(HQMIcing.Properties.Settings.Default.icingType);
 
             while(true)
             {
@@ -16,7 +18,7 @@ namespace IcingRef
                     linesman.checkForIcing();
                 else if (GameInfo.AfterGoalFaceoffTime != 0 && linesman.currIcingState != Linesman.icingState.None)
                     linesman.clearIcing();
-                System.Threading.Thread.Sleep(10);       // check every millisecond
+                System.Threading.Thread.Sleep(10);
             }
         }
     }

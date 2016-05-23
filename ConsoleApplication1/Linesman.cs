@@ -13,18 +13,22 @@ namespace IcingRef
         const float RIGHT_GOALPOST = 16.25f;
         const float TOP_GOALPOST = 0.83f;
 
-        icingType currIcingType = icingType.Touch;
+        icingType currIcingType;
+        public icingState currIcingState = icingState.None;
         HQMTeam lastTouchedPuck = HQMTeam.NoTeam;
         float previousPuckZ = Puck.Position.Z;
         bool hasWarned = false;
-        public icingState currIcingState = icingState.None;
+
+        float currentPuckX, currentPuckY, currentPuckZ;
+        bool puckTouched;
+
 
         public void checkForIcing()
         {
-            float currentPuckZ = Puck.Position.Z;
-            float currentPuckY = Puck.Position.Y;
-            float currentPuckX = Puck.Position.X;
-            bool puckTouched = true;
+            currentPuckZ = Puck.Position.Z;
+            currentPuckY = Puck.Position.Y;
+            currentPuckX = Puck.Position.X;
+            puckTouched = true;
             if (teamTouchedPuck() == HQMTeam.NoTeam)
                 puckTouched = false;
 
@@ -32,6 +36,18 @@ namespace IcingRef
             if (puckTouched)
                 lastTouchedPuck = teamTouchedPuck();
 
+            setIcingState();
+            detectIcingState();
+            detectTouchIcingState();
+
+            if (currIcingState == icingState.None)
+                hasWarned = false;
+
+            previousPuckZ = Puck.Position.Z;
+        }
+
+        void setIcingState()
+        {
             // detect red icing
             if (lastTouchedPuck == HQMTeam.Red &&
                 !puckTouched &&                             // has puck been shot by red and no longer touched?
@@ -45,9 +61,11 @@ namespace IcingRef
                 previousPuckZ < CENTER_ICE &&
                 currentPuckZ >= CENTER_ICE)
                 currIcingState = icingState.Blue;
+        }
 
-            // call icing method
-            else if (currIcingState == icingState.Red)
+        void detectIcingState()
+        {
+            if (currIcingState == icingState.Red)
             {
                 if (currentPuckZ > BLUE_GOALLINE_Z && puckTouched)
                     clearIcing();
@@ -65,18 +83,6 @@ namespace IcingRef
 
                     else
                         clearIcing();
-                }
-            }
-
-            else if (currIcingState == icingState.RedCross)
-            {
-                if (puckTouched)
-                {
-                    if (teamTouchedPuck() == HQMTeam.Red)
-                        clearIcing();
-
-                    else if (teamTouchedPuck() == HQMTeam.Blue)
-                        callIcing("RED");
                 }
             }
 
@@ -100,6 +106,23 @@ namespace IcingRef
                         clearIcing();
                 }
             }
+        }
+
+        void detectTouchIcingState()
+        {
+            if (currIcingState == icingState.RedCross)
+            {
+                if (puckTouched)
+                {
+                    if (teamTouchedPuck() == HQMTeam.Red)
+                        clearIcing();
+
+                    else if (teamTouchedPuck() == HQMTeam.Blue)
+                        callIcing("RED");
+                }
+            }
+
+
 
             else if (currIcingState == icingState.BlueCross)
             {
@@ -112,11 +135,6 @@ namespace IcingRef
                         callIcing("BLUE");
                 }
             }
-
-            if (currIcingState == icingState.None)
-                hasWarned = false;
-
-            previousPuckZ = Puck.Position.Z;
         }
 
         HQMTeam teamTouchedPuck()
@@ -157,6 +175,28 @@ namespace IcingRef
         bool puckOnNet(float x, float y)
         {
             return !(x < LEFT_GOALPOST || x > RIGHT_GOALPOST || y > TOP_GOALPOST);
+        }
+
+        public void setIcingType(string type)
+        {
+            switch (type)
+            {
+                case "Touch":
+                    {
+                        currIcingType = icingType.Touch;
+                        break;
+                    }
+                case "NoTouch":
+                    {
+                        currIcingType = icingType.NoTouch;
+                        break;
+                    }
+                case "Hybrid":
+                    { 
+                    currIcingType = icingType.Hybrid;
+                    break;
+                    }
+            }
         }
 
         public enum icingState
