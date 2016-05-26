@@ -16,50 +16,44 @@ namespace IcingRef
         icingType currIcingType;
         public icingState currIcingState = icingState.None;
         HQMTeam lastTouchedPuck = HQMTeam.NoTeam;
-        float previousPuckZ = Puck.Position.Z;
+
+        HQMVector lastTouchedPuckAt = Puck.LastTouchedPosition;
+        HQMVector currentPuckVector;
+        HQMVector previousPuckVector = Puck.Position;
         bool hasWarned = false;
-
-        float currentPuckX, currentPuckY, currentPuckZ;
-        bool puckTouched;
-
+        bool isPuckTouched = false;
 
         public void checkForIcing()
         {
-            currentPuckZ = Puck.Position.Z;
-            currentPuckY = Puck.Position.Y;
-            currentPuckX = Puck.Position.X;
-            puckTouched = true;
-            if (teamTouchedPuck() == HQMTeam.NoTeam)
-                puckTouched = false;
-
+            currentPuckVector = Puck.Position;
+            lastTouchedPuckAt = Puck.LastTouchedPosition;
             Player[] players = PlayerManager.Players;
-            if (puckTouched)
-                lastTouchedPuck = teamTouchedPuck();
+            isPuckTouched = puckTouched();
 
             setIcingState();
             detectIcingState();
             detectTouchIcingState();
 
-            if (currIcingState == icingState.None)
+            if (hasWarned = true && currIcingState == icingState.None)
                 hasWarned = false;
 
-            previousPuckZ = Puck.Position.Z;
+            previousPuckVector = Puck.Position;
         }
 
         void setIcingState()
         {
             // detect red icing
             if (lastTouchedPuck == HQMTeam.Red &&
-                !puckTouched &&                             // has puck been shot by red and no longer touched?
-                previousPuckZ > CENTER_ICE &&
-                currentPuckZ <= CENTER_ICE)
+                !isPuckTouched &&                             // has puck been shot by red and no longer touched?
+                previousPuckVector.Z > CENTER_ICE &&
+                currentPuckVector.Z <= CENTER_ICE)
                 currIcingState = icingState.Red;
 
             // detect blue icing
             else if (lastTouchedPuck == HQMTeam.Blue &&
-                !puckTouched &&                             // has puck been shot by blue and no longer touched?
-                previousPuckZ < CENTER_ICE &&
-                currentPuckZ >= CENTER_ICE)
+                !isPuckTouched &&                             // has puck been shot by blue and no longer touched?
+                previousPuckVector.Z < CENTER_ICE &&
+                currentPuckVector.Z >= CENTER_ICE)
                 currIcingState = icingState.Blue;
         }
 
@@ -67,18 +61,18 @@ namespace IcingRef
         {
             if (currIcingState == icingState.Red)
             {
-                if (currentPuckZ > BLUE_GOALLINE_Z && puckTouched)
+                if (currentPuckVector.Z > BLUE_GOALLINE_Z && isPuckTouched)
                     clearIcing();
 
-                else if (currentPuckZ < BLUE_WARNINGLINE && !hasWarned)
+                else if (currentPuckVector.Z < BLUE_WARNINGLINE && !hasWarned)
                     warnIcing("RED");
 
-                else if (currentPuckZ <= BLUE_GOALLINE_Z)
+                else if (currentPuckVector.Z <= BLUE_GOALLINE_Z)
                 {
-                    if (currIcingType == icingType.Touch && !puckOnNet(currentPuckX, currentPuckY))
+                    if (currIcingType == icingType.Touch && !puckOnNet(currentPuckVector.X, currentPuckVector.Y))
                         currIcingState = icingState.RedCross;
 
-                    else if (!puckOnNet(currentPuckX, currentPuckY))
+                    else if (!puckOnNet(currentPuckVector.X, currentPuckVector.Y))
                         callIcing("RED");
 
                     else
@@ -88,18 +82,18 @@ namespace IcingRef
 
             else if (currIcingState == icingState.Blue)
             {
-                if (currentPuckZ < RED_GOALLINE_Z && puckTouched)
+                if (currentPuckVector.Z < RED_GOALLINE_Z && isPuckTouched)
                     clearIcing();
 
-                else if (currentPuckZ > RED_WARNINGLINE && !hasWarned)
+                else if (currentPuckVector.Z > RED_WARNINGLINE && !hasWarned)
                     warnIcing("BLUE");
 
-                else if (currentPuckZ >= RED_GOALLINE_Z)
+                else if (currentPuckVector.Z >= RED_GOALLINE_Z)
                 {
-                    if (currIcingType == icingType.Touch && !puckOnNet(currentPuckX, currentPuckY))
+                    if (currIcingType == icingType.Touch && !puckOnNet(currentPuckVector.X, currentPuckVector.Y))
                         currIcingState = icingState.BlueCross;
 
-                    else if (!puckOnNet(currentPuckX, currentPuckY))
+                    else if (!puckOnNet(currentPuckVector.X, currentPuckVector.Y))
                         callIcing("BLUE");
 
                     else
@@ -112,7 +106,7 @@ namespace IcingRef
         {
             if (currIcingState == icingState.RedCross)
             {
-                if (puckTouched)
+                if (isPuckTouched)
                 {
                     if (teamTouchedPuck() == HQMTeam.Red)
                         clearIcing();
@@ -126,7 +120,7 @@ namespace IcingRef
 
             else if (currIcingState == icingState.BlueCross)
             {
-                if (puckTouched)
+                if (isPuckTouched)
                 {
                     if (teamTouchedPuck() == HQMTeam.Blue)
                         clearIcing();
@@ -175,6 +169,18 @@ namespace IcingRef
         bool puckOnNet(float x, float y)
         {
             return !(x < LEFT_GOALPOST || x > RIGHT_GOALPOST || y > TOP_GOALPOST);
+        }
+
+        bool puckTouched()
+        {
+            if (lastTouchedPuckAt != Puck.LastTouchedPosition)
+            {
+                teamTouchedPuck();
+                lastTouchedPuckAt = Puck.LastTouchedPosition;
+                return true;
+            }
+            else
+                return false;
         }
 
         public void setIcingType(string type)
