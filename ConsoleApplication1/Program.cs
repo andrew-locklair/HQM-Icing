@@ -1,5 +1,4 @@
 ﻿using HQMEditorDedicated;
-using System;
 
 namespace IcingRef
 {
@@ -18,7 +17,6 @@ namespace IcingRef
                     linesman.checkForIcing();
                 else if (GameInfo.AfterGoalFaceoffTime != 0 && linesman.currIcingState != Linesman.icingState.None)
                     linesman.clearIcing();
-                System.Threading.Thread.Sleep(10);
             }
         }
     }
