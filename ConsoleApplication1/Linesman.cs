@@ -1,4 +1,5 @@
 ﻿using HQMEditorDedicated;
+using System;
 
 namespace IcingRef
 {
@@ -14,30 +15,38 @@ namespace IcingRef
         const float TOP_GOALPOST = 0.83f;
 
         icingType currIcingType;
-        public icingState currIcingState = icingState.None;
+        public icingState currIcingState;
         HQMTeam lastTouchedPuck = HQMTeam.NoTeam;
 
         HQMVector lastTouchedPuckAt = Puck.LastTouchedPosition;
         HQMVector currentPuckVector;
         HQMVector previousPuckVector = Puck.Position;
-        bool hasWarned = false;
+        bool hasWarned;
         bool isPuckTouched = false;
 
         public void checkForIcing()
         {
             currentPuckVector = Puck.Position;
-            lastTouchedPuckAt = Puck.LastTouchedPosition;
+            if (currentPuckVector == previousPuckVector)
+                return;
             Player[] players = PlayerManager.Players;
             isPuckTouched = puckTouched();
 
-            setIcingState();
-            detectIcingState();
-            detectTouchIcingState();
+            if (currIcingState == icingState.None)
+                setIcingState();
 
-            if (hasWarned = true && currIcingState == icingState.None)
+            if (currIcingState != icingState.None)
+            {
+                detectIcingState();
+                detectTouchIcingState();
+            }
+            
+            if (hasWarned == true && currIcingState == icingState.None)
+            {
                 hasWarned = false;
-
-            previousPuckVector = Puck.Position;
+            }
+                
+            previousPuckVector = currentPuckVector;
         }
 
         void setIcingState()
@@ -108,39 +117,37 @@ namespace IcingRef
             {
                 if (isPuckTouched)
                 {
-                    if (teamTouchedPuck() == HQMTeam.Red)
+                    if (lastTouchedPuck == HQMTeam.Red)
                         clearIcing();
 
-                    else if (teamTouchedPuck() == HQMTeam.Blue)
+                    else if (lastTouchedPuck == HQMTeam.Blue)
                         callIcing("RED");
                 }
             }
-
-
 
             else if (currIcingState == icingState.BlueCross)
             {
                 if (isPuckTouched)
                 {
-                    if (teamTouchedPuck() == HQMTeam.Blue)
+                    if (lastTouchedPuck == HQMTeam.Blue)
                         clearIcing();
 
-                    else if (teamTouchedPuck() == HQMTeam.Red)
+                    else if (lastTouchedPuck == HQMTeam.Red)
                         callIcing("BLUE");
                 }
             }
         }
 
-        HQMTeam teamTouchedPuck()
+        void teamTouchedPuck()
         {
             foreach (Player p in PlayerManager.Players)
             {
-                if ((p.StickPosition - Puck.Position).Magnitude < 0.25f)
+                if (p.Team != HQMTeam.NoTeam && (p.StickPosition - lastTouchedPuckAt).Magnitude < 0.25f)
                 {
-                    return p.Team;
+                    lastTouchedPuck = p.Team;
+                    return;
                 }
             }
-            return HQMTeam.NoTeam;
         }
 
         public void clearIcing()
@@ -175,8 +182,8 @@ namespace IcingRef
         {
             if (lastTouchedPuckAt != Puck.LastTouchedPosition)
             {
-                teamTouchedPuck();
                 lastTouchedPuckAt = Puck.LastTouchedPosition;
+                teamTouchedPuck();      
                 return true;
             }
             else
