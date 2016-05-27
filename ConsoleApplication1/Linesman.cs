@@ -17,12 +17,11 @@ namespace IcingRef
         icingType currIcingType;
         public icingState currIcingState;
         HQMTeam lastTouchedPuck = HQMTeam.NoTeam;
-
         HQMVector lastTouchedPuckAt = Puck.LastTouchedPosition;
         HQMVector currentPuckVector;
         HQMVector previousPuckVector = Puck.Position;
         bool hasWarned;
-        bool isPuckTouched = false;
+        bool isPuckTouched;
 
         public void checkForIcing()
         {

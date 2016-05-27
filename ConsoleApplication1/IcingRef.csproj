@@ -50,7 +50,7 @@
   <ItemGroup>
     <Reference Include="HQMEditorDedicated, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\HQMEditorDedicatedFork\HQMEditorDedicated\bin\Debug\HQMEditorDedicated.dll</HintPath>
+      <HintPath>..\..\..\..\..\Source\Repos\HQMEditorDedicated\HQMEditorDedicated\bin\Release\HQMEditorDedicated.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
