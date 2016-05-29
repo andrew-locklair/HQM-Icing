@@ -164,8 +164,123 @@ namespace IcingRef
             Tools.ForceFaceoff();
             Tools.ResumeGame();
             currIcingState = icingState.None;
+            setFaceoffPositions(team);
         }
 
+        void setFaceoffPositions(string team = "")
+        {
+            float offsetX, offsetZ, teamOffsetZ, positionX, positionZ;
+            HQMVector v;
+
+            if (currentPuckVector.X <= 15)
+                offsetX = 7.99f;
+            else
+                offsetX = 22.01f;
+
+            if (team == "RED")
+                offsetZ = 50.96f;
+            else if (team == "BLUE")
+                offsetZ = 10.04f;
+            else
+                offsetZ = 0;
+
+            System.Threading.Thread.Sleep(15);
+            Puck.Position = new HQMVector(offsetX, 2.5f, offsetZ);
+            Puck.Velocity = new HQMVector(0, 0, 0);
+            Puck.RotationalVelocity = new HQMVector(0, 0, 0);
+
+            foreach (Player p in PlayerManager.Players)
+            {
+                if (p.Team == HQMTeam.NoTeam)
+                    continue;
+                else if (p.Team == HQMTeam.Blue)
+                {
+                    teamOffsetZ = -2.77f;
+
+                    switch (p.Role)
+                    {
+                        case HQMRole.C:
+                            positionX = 0f;
+                            positionZ = 0f;
+                            v = new HQMVector(offsetX + positionX, 4.5f, offsetZ + teamOffsetZ + positionZ);
+                            p.Position = v;
+                            break;
+                        case HQMRole.LW:
+                            positionX = -5f;
+                            positionZ = -1.26f;
+                            v = new HQMVector(offsetX + positionX, 4.5f, offsetZ + teamOffsetZ + positionZ);
+                            p.Position = v;
+                            break;
+                        case HQMRole.RW:
+                            positionX = 5f;
+                            positionZ = -1.26f;
+                            v = new HQMVector(offsetX + positionX, 4.5f, offsetZ + teamOffsetZ + positionZ);
+                            p.Position = v;
+                            break;
+                        case HQMRole.LD:
+                            positionX = -2f;
+                            positionZ = -7.26f;
+                            v = new HQMVector(offsetX + positionX, 4.5f, offsetZ + teamOffsetZ + positionZ);
+                            p.Position = v;
+                            break;
+                        case HQMRole.RD:
+                            positionX = 2f;
+                            positionZ = -7.26f;
+                            v = new HQMVector(offsetX + positionX, 4.5f, offsetZ + teamOffsetZ + positionZ);
+                            p.Position = v;
+                            break;
+                        case HQMRole.G:
+                        default:
+                            break;
+                    }
+                }
+
+                else
+                {
+                    teamOffsetZ = 2.77f;
+
+                    switch (p.Role)
+                    {
+                        case HQMRole.C:
+                            positionX = 0f;
+                            positionZ = 0f;
+                            v = new HQMVector(offsetX + positionX, 4.5f, offsetZ + teamOffsetZ + positionZ);
+                            p.Position = v;
+                            string s = v.ToString();
+                            Chat.SendMessage("Position " + s);
+                            break;
+                        case HQMRole.LW:
+                            positionX = 5f;
+                            positionZ = 1.26f;
+                            v = new HQMVector(offsetX + positionX, 4.5f, offsetZ + teamOffsetZ + positionZ);
+                            p.Position = v;
+                            break;
+                        case HQMRole.RW:
+                            positionX = -5f;
+                            positionZ = 1.26f;
+                            v = new HQMVector(offsetX + positionX, 4.5f, offsetZ + teamOffsetZ + positionZ);
+                            p.Position = v;
+                            break;
+                        case HQMRole.LD:
+                            positionX = 2f;
+                            positionZ = 7.26f;
+                            v = new HQMVector(offsetX + positionX, 4.5f, offsetZ + teamOffsetZ + positionZ);
+                            p.Position = v;
+                            break;
+                        case HQMRole.RD:
+                            positionX = -2f;
+                            positionZ = 7.26f;
+                            v = new HQMVector(offsetX + positionX, 4.5f, offsetZ + teamOffsetZ + positionZ);
+                            p.Position = v;
+                            break;
+                        case HQMRole.G:
+                        default:
+                            break;
+                    }
+                }
+            }
+            return;
+        }
         void warnIcing(string team = "")
         {
             Chat.SendMessage("ICING WARNING - " + team);
